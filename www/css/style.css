@@ -25,16 +25,6 @@ ion-popover-view.fit ion-content {
     opacity: 0.9;
 }
 
-/* .ion-wikipedia:before { */
-/*     /\* content: ""; *\/ */
-/*     /\* content: url(../img/WikipediaW.svg); *\/ */
-/*     /\* background-image: url(../img/WikipediaW.svg); *\/ */
-/*     width: 24px; */
-/*     height: 32px; */
-/*     padding: 6px 0px 0px 0px !important; */
-/*     opacity: 0.9; */
-/* } */
-
 .ion-wikipedia {
     content: url(../img/WikipediaW.svg);
 }
@@ -48,7 +38,7 @@ ion-popover-view.fit ion-content {
 }
 
 .navbar-button {
-    min-width: 30px !important;
+    min-width: 5vh !important;
     text-align: center !important;
     padding-left: 0px !important;
     padding-right: 0px !important;
@@ -75,8 +65,8 @@ ion-popover-view.fit ion-content {
 .button.icon.reader-big-button-icon:before, 
 .button.icon-left.reader-big-button-icon:before, 
 .button.icon-right.reader-big-button-icon:before {
-    font-size: 50px !important;
-    line-height: 50px !important;
+    font-size: 5vh !important;
+    line-height: 5vh !important;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -94,13 +84,7 @@ ion-popover-view.fit ion-content {
 .right .button.icon.reader-big-button-icon:before, 
 .right .button.icon-left.reader-big-button-icon:before, 
 .right .button.icon-right.reader-big-button-icon:before {
-    /* float: right; */
     right: 0;
-
-}
-
-.right .button:before {
-    /* float: right; */
 }
 
 .ionicon-x-large:before {
@@ -109,4 +93,13 @@ ion-popover-view.fit ion-content {
 
 .bookmark-pushed {
     color: #86F053 !important;
+    /* color: #1565C0 !important; */
+}
+
+
+@media only screen and (max-width: 950px) {
+
+    .navbar-button {
+	min-width: 5vh !important;
+    }
 }
