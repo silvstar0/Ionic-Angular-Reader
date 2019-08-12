@@ -74,8 +74,9 @@
 }
 
 .app .readerBar > div {
-    -webkit-flex: 0 0 auto;
-    flex: 0 0 auto;
+    /* needed to remove to fix header centering as noted below */
+    /* -webkit-flex: 0 0 auto; */
+    /* flex: 0 0 auto; */
 }
 
 .app .readerBar .title {
@@ -365,6 +366,10 @@
     text-decoration: none;
     outline: 0;
     line-height: 50px;
+
+/* bigger / responsive */
+    line-height: 4rem;
+
     border-bottom: 2px solid transparent;
     cursor: pointer;
     -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
@@ -755,7 +760,7 @@
 .button.icon.reader-big-button-icon:before, 
 .button.icon-left.reader-big-button-icon:before, 
 .button.icon-right.reader-big-button-icon:before {
-    font-size: 5vh !important;
+    font-size: 4vh !important;
     line-height: 5vh !important;
     position: absolute;
     top: 50%;
@@ -779,3 +784,34 @@
 }
 
 
+/* because I've introduced a second icon on the right of the header, the title doesn't center correctly. Fix that.  */
+/* via https://stackoverflow.com/questions/22429003/how-to-right-align-flex-item */
+.readerBarBox {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* make the title chunk bigger than the icon containers */
+.title.readerBarBox {
+    flex-grow: 5 !important;
+}
+
+.readerBarBox:first-child > button { margin-right: auto; }
+.readerBarBox:last-child  > button {}
+
+/* give some breathing room at top of mobile devices for the tabs */
+
+.platform-ios .app .sidebar {
+    top: 10px;
+}
+.platform-android .app .sidebar {
+    top: 10px;
+}
+
+/* fix the notch on iPhoneX */
+/* roughly via: https://github.com/ionic-team/ionic-v1/issues/343 to fix iPhone X */
+
+.platform-ios .app, .app .sidebar {
+    padding-top: calc(env(safe-area-inset-bottom));
+}
