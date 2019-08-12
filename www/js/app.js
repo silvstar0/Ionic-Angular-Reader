@@ -40,15 +40,21 @@ angular.module('readerDemo', ['ionic', 'epubreader'])
     	console.log('text selected', event, data);
     });
 
-    $rootScope.$on('epubReaderHighlightSaveRequested', function (event, data) {
+    $rootScope.$on('epubReaderHighlightSave', function (event, data) {
     	console.log('highlight save requested', event, data);
     });
 
-    $rootScope.$on('epubReaderHighlightDeleteRequested', function (event, data) {
+
+    $rootScope.$on('epubReaderHighlightDelete', function (event, data) {
     	console.log('highlight delete requested', event, data);
     });
 
+    $rootScope.$on('epubReaderAnnotationSave', function (event, data) {
+	// note: delete of annotation comes as a new save of an annotation, with no annotation text.
+    	console.log('annotation save requested', event, data);
+    });
 
+    // need deleted event and edited event.
     
 })
 
