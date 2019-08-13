@@ -1,6 +1,6 @@
-An ePub reader for browsers and mobile devices (via Ionic/Angular).
+A mobile-friendly ePub reader for browsers and mobile devices (via Ionic/Angular).
 
-Implemented as an Angular directive, compatible with Ionic / Angular v1, intended for inclusion into other Ionic apps. A sample Ionic app shows how to integrate to a larger Ionic app. Work is currently under way to integrate this reader into [Bookship](https://www.bookshipapp.com), a Social Reading app. 
+Implemented as an Angular directive, compatible with Ionic / Angular v1, intended for inclusion into other Ionic apps and for use on mobile devices. A sample Ionic app shows how to integrate to a larger Ionic app. Work is currently under way to integrate this reader into [Bookship](https://www.bookshipapp.com), a Social Reading app. 
 
 ionic-epub-reader is a reworking of [Patrick G](https://github.com/geek1011)'s excellent [ePubViewer](https://github.com/geek1011/ePubViewer), to make it compatible with [AngularJS] v1 and [Ionic v1](https://ionicframework.com/docs/v1/), to make it mobile-friendly, and to introduce additional capabilities. The feature set is intended to be comparable to those of major readers such as the Kindle and Kobo apps.
 
@@ -44,15 +44,19 @@ Modify your index.html file to include the following:
 ```html
 <link rel="stylesheet" href="lib/normalize.min.css">
 <link href="css/readerstyle.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Arbutus+Slab" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700,700i" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Spectral" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Libre+Baskerville" rel="stylesheet">
 <script src="lib/sanitize-html.min.js"></script>
 <script src="lib/jszip.min.js"></script>
-<script src="lib/epub.js"></script>
+<script src="lib/epub.v0.3.66.js"></script>
 <script src="js/angularEpubReader.js"></script>
 ```
 
-Include the custom directive in your index.html file, or in a template.
+NOTE: This directive uses a slightly modified version of epub.js, see below.
+
+Include the custom directive in your index.html file, or in a template (see for example the file ```tab-reader.html``` in the example app).
 
 ```html
 <ion-pane>
@@ -68,9 +72,12 @@ The `<epubreader>` directive accepts arguments:
 
 * `src`: a url pointing to an ePub file to load. If not present, the user is presented with an open file button.
 * `use-local-storage`: true|false, controls whether user data (e.g. bookmarks) are persisted to the browser's localStorage
+* `highlight-array`: optional. An array of highlights to be loaded to the book after load is complete. highlights should consist of a cfi field, and optionally an annotationText field for annotations. see `controllers.js` for an example.  
+*  `bookmark-array`: optional. An array of bookmarks to be loaded to the book after load is complete. see `controllers.js` for an example. 
 
 #### Add module "epubreader" as dependency
-```js
+
+```
 angular.module('starter', ['ionic', 'epubreader'])
 ```
 
@@ -124,16 +131,16 @@ The key lifecycle events and their arguments:
 
 * ```epubReaderBookmarkSave```: issued after a bookmark is saved. carries bookmark as argument
 * ```epubReaderBookmarkDelete```: issued after a bookmark is deleted. carries bookmark as argument
+* ```epubReaderHighlightSave```: issued whenever a highlight is saved by the user. carries highlight structure as argument. 
+* ```epubReaderHighlightDelete```: issued after a highlight is deleted. The semantics of the reader are that if a highlight is deleted, any attached annotations are automatically deleted as well.
+* ```epubReaderAnnotationSave```: issued whenever an annotation / note is saved by the user. carries the highlight structure as argument, that the annotation is attached to, and the annotationText field will be present with the highlight.
+* ```epubReaderAnnotationDelete```: issued after an annotation is deleted. This does not delete the associated highlight.
 * ```epubReaderSaveSettings```: issued whenever reader settings are changed (currently, just display options). carries settings object as argument
 * ```epubReaderCurrentLocation```: issued whenever reader location is changed. carries position as argument
 * ```epubReaderNextPage```: issued whenever (next) paging occurs. carries the position BEFORE the page change as argument
 * ```epubReaderPrevPage```: issued whenever (prev) paging occurs. carries the position BEFORE the page change as argument
 * ```epubReaderSetLocation```: issued when the user manually sets a location (page) number. carries the target position as an argument, in the form of a structure containing  {location: <int>, cfi: cfi, bookLength: <int>}
 * ```epubReaderTextSelected```: issued whenever the user selects text, before a highlight is created. carries as argument a structure containing {text, cfi, range} fields.
-* ```epubReaderHighlightSave```: issued whenever a highlight is saved by the user. carries highlight structure as argument. 
-* ```epubReaderHighlightDelete```: issued after a highlight is deleted. The semantics of the reader are that if a highlight is deleted, any attached annotations are automatically deleted as well.
-* ```epubReaderAnnotationSave```: issued whenever an annotation / note is saved by the user. carries the highlight structure as argument, that the annotation is attached to, and the annotationText field will be present with the highlight.
-* ```epubReaderAnnotationDelete```: issued after an annotation is deleted. This does not delete the associated highlight.
 
 The example app shows how to monitors these events, e.g.:
 
@@ -151,16 +158,22 @@ You will need to have Ionic V1 installed to run the sample app.
 
 This reader contains a number of features the original reader by [Patrick G](https://github.com/geek1011) did not. 
 
-Parts of it are substantially re-written, parts become quite a bit simpler by using the Angular templating system, other parts (styling, for example) are mostly unchanged, except to rename
+Parts of it are substantially re-written, parts become simpler by using the Angular templating system, other parts (styling, for example) are mostly unchanged, except to rename
 some classes to prevent collision with Ionic's built-in styling classes. I have also removed the original project's dependency on jQuery. I have also updated the font selection and made
 minor changes to the styling, particularly to address mobile devices. 
 
 A simpler, pure Angular/Ionic version of that reader, without the extra bells & whistles, can be found here: [angular-epub-reader](https://github.com/viking2917/angular-epub-reader). It is
 more-or-less a straight AngularJS/Ionic port of [ePubViewer](https://github.com/geek1011/ePubViewer).
 
+### Changes to epub.js.
+
+This directive uses the [ePub.js] in a slightly modified form, to enable selection and highlighting to work on mobile devices. In particular, the "onSelectionChange" handler in epub.js (~
+line 4842) is changed to have a 2 second endTimeout instead of 250 milliseconds. This gives the user time to adjust the drag handles on mobile devices - otherwise the event fires so quickly
+that selection is assumed to be done by the system before the user can intervene to change the range selected. Hacky, I know. Open to better suggestions.
+
 ## Tests
 
-Tests are implemented via [Testcafe])(https://www.testcafe.com), and are located in the `tests` directory. Installing testcafe is straightforward:
+Tests are implemented via [Testcafe](https://www.testcafe.com), and are located in the `tests` directory. Installing testcafe is straightforward:
 
 ```
 npm install -g testcafe
@@ -206,7 +219,7 @@ Ionic-epub-reader has been tested on iOS and Android devices, Chrome, and to a l
 
 ## Acknowledgments
 
-Greatful thanks to 
+Grateful thanks to 
 
 * [Patrick G](https://github.com/geek1011), the original author of [ePubViewer](https://github.com/geek1011/ePubViewer)- his reader code was straightforward to understand, adapt and extend.
 * [Futurepress](http://futurepress.org), for creating ePub.js[https://github.com/futurepress/epub.js/] in the first place. 
